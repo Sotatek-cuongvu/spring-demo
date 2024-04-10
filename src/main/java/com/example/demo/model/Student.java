@@ -17,6 +17,7 @@ public class Student {
     @Column
     private int age;
     @Column
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     @OneToOne(cascade = CascadeType.ALL)
     private Address address;

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -33,54 +32,33 @@ public class StudentServices {
     }
 
     public List<Student> getStudentsByProvince(String province, int length) {
-        List<Student> result = new ArrayList<>();
-
-        return this.getStudents().stream().filter(
-                s -> (s.getAddress() != null && s.getAddress().getProvince() != null && Objects.equals(s.getAddress().getProvince().toLowerCase(), province.toLowerCase()))
-        ).limit(length).collect(Collectors.toList());
+        return studentRepository.findByAddress_ProvinceIgnoreCase(province).stream().limit(length).collect(Collectors.toList());
     }
 
     public int countStudentByGenderAndProvince(String province, Gender gender) {
-        return (int) this.getStudents().stream()
-                .filter(
-                        s -> (s.getGender() == gender && s.getAddress() != null && Objects.equals(s.getAddress().getProvince().toLowerCase(), province.toLowerCase()))
-                ).count();
+        return studentRepository.countByGenderAndAddress_ProvinceIgnoreCase(gender, province);
     }
 
     public int getAverageAgeByGender(Gender gender) {
-        Stream<Student> stream = this.getStudents().stream().filter(s -> (s.getGender() == gender));
+        Stream<Student> stream = studentRepository.findByGender(gender).stream();
         return (int) stream.mapToDouble(Student::getAge).average().orElse(0.0);
     }
 
     public boolean checkStudentIsExisted(String name, int age, Gender gender, String province) {
-        return this.getStudents().stream().filter(
-                (s) -> (
-                        Objects.equals(s.getName().toLowerCase(), name.toLowerCase())
-                                && s.getAge() == age
-                                && s.getGender() == gender
-                                && s.getAddress() != null
-                                && Objects.equals(s.getAddress().getProvince().toLowerCase(), province.toLowerCase())
-                )
-        ).count() > 0.;
+        return studentRepository.existsByNameIgnoreCaseAndAgeAndGenderAndAddress_ProvinceIgnoreCase(name, age, gender, province);
     }
 
     public int countWithoutAddress(Gender gender) {
-        return (int) this.getStudents().stream().filter((s) -> (s.getGender() == gender && s.getAddress() == null)).count();
+        return studentRepository.countByGenderAndAddressIsNull(gender);
     }
 
     public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender) {
-        return this.getStudents().stream()
-                .filter(s -> (s.getGender() == gender && s.getName().startsWith(prefixName)))
-                .map(Student::getAge)
-                .toList();
+        return studentRepository.findByNameStartingWithIgnoreCaseAndGender(prefixName, gender).stream().map(Student::getAge).toList();
     }
 
     public List<Student> getStudentsByAddress(String province, String district, String village) {
-        return this.getStudents().stream().filter(s -> (s.getAddress() != null
-                        && Objects.equals(s.getAddress().getProvince().toLowerCase(), province.toLowerCase())
-                        && Objects.equals(s.getAddress().getDistrict().toLowerCase(), district.toLowerCase())
-                        && Objects.equals(s.getAddress().getVillage().toLowerCase(), village.toLowerCase())
-                )
-        ).sorted(Comparator.comparing(Student::getName).reversed().thenComparing(Student::getAge).reversed()).toList();
+        return studentRepository.findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(province, district, village)
+                .stream()
+                .sorted(Comparator.comparing(Student::getName).reversed().thenComparing(Student::getAge).reversed()).toList();
     }
 }
