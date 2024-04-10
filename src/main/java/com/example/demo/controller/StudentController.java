@@ -1,9 +1,9 @@
-package com.example.demo.controllers;
+package com.example.demo.controller;
 
-import com.example.demo.dtos.StudentRequest;
-import com.example.demo.models.Gender;
-import com.example.demo.models.Student;
-import com.example.demo.services.StudentServices;
+import com.example.demo.dto.StudentRequest;
+import com.example.demo.model.Gender;
+import com.example.demo.model.Student;
+import com.example.demo.service.StudentServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

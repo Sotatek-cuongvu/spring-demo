@@ -1,7 +1,7 @@
-package com.example.demo.dtos;
+package com.example.demo.dto;
 
-import com.example.demo.models.Address;
-import com.example.demo.models.Gender;
+import com.example.demo.model.Address;
+import com.example.demo.model.Gender;
 import lombok.Getter;
 
 @Getter
