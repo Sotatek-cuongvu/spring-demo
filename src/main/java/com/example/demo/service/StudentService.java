@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class StudentServices {
+public class StudentService {
 
     @Autowired
     StudentRepository studentRepository;
