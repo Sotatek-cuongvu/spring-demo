@@ -5,6 +5,10 @@ import com.example.demo.model.Gender;
 import com.example.demo.model.Student;
 import com.example.demo.service.StudentServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +23,34 @@ public class StudentController {
 
     // Get method
     @GetMapping("/")
-    public ResponseEntity<List<Student>> getStudentList() {
-        return ResponseEntity.status(HttpStatus.OK).body(studentServices.getStudents());
+    public ResponseEntity<Page<Student>> getStudentList(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize
+    ) {
+
+        Pageable pageData = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
+        return ResponseEntity.status(HttpStatus.OK).body(studentServices.getStudents(pageData)
+        );
     }
 
     @GetMapping("/address/")
-    public List<Student> getStudentByProvince(
+    public Page<Student> getStudentByProvince(
             @RequestParam String province,
-            @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) String district,
-            @RequestParam(required = false) String village
+            @RequestParam(required = false) String village,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize
     ) {
-        if (district != null && village != null)
-            return studentServices.getStudentsByAddress(province, district, village);
-        return studentServices.getStudentsByProvince(province, limit == null ? 10 : limit);
+        Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
+        if (district != null && village != null) {
+            pageable = PageRequest.of(
+                    (page == null) ? 0 : page,
+                    (pageSize == null) ? 10 : pageSize,
+                    Sort.by("name").and(Sort.by("age").descending())
+            );
+            return studentServices.getStudentsByAddress(province, district, village, pageable);
+        }
+        return studentServices.getStudentsByProvince(province, pageable);
     }
 
     @GetMapping("/province/count/")
@@ -46,7 +64,7 @@ public class StudentController {
     }
 
     @GetMapping("/age/average/")
-    public Integer getAgeAverage(@RequestParam Gender gender) {
+    public Double getAgeAverage(@RequestParam Gender gender) {
         return studentServices.getAverageAgeByGender(gender);
     }
 
@@ -61,8 +79,15 @@ public class StudentController {
     }
 
     @GetMapping("/age/list/")
-    public List<Integer> getListAgeByPrefixNameAndGender(@RequestParam String prefixName, @RequestParam Gender gender) {
-        return studentServices.getAgeByPrefixNameAndGender(prefixName, gender);
+    public List<Integer> getListAgeByPrefixNameAndGender(
+            @RequestParam String prefixName,
+            @RequestParam Gender gender,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize
+
+    ) {
+        Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
+        return studentServices.getAgeByPrefixNameAndGender(prefixName, gender, pageable);
     }
 
     // Post Method

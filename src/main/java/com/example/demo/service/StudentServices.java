@@ -5,14 +5,13 @@ import com.example.demo.model.Gender;
 import com.example.demo.model.Student;
 import com.example.demo.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class StudentServices {
@@ -27,21 +26,20 @@ public class StudentServices {
         return true;
     }
 
-    public List<Student> getStudents() {
-        return studentRepository.findAll();
+    public Page<Student> getStudents(Pageable pageRequest) {
+        return studentRepository.findAll(pageRequest);
     }
 
-    public List<Student> getStudentsByProvince(String province, int length) {
-        return studentRepository.findByAddress_ProvinceIgnoreCase(province).stream().limit(length).collect(Collectors.toList());
+    public Page<Student> getStudentsByProvince(String province, Pageable pageable) {
+        return studentRepository.findByAddress_ProvinceIgnoreCase(province, pageable);
     }
 
     public int countStudentByGenderAndProvince(String province, Gender gender) {
         return studentRepository.countByGenderAndAddress_ProvinceIgnoreCase(gender, province);
     }
 
-    public int getAverageAgeByGender(Gender gender) {
-        Stream<Student> stream = studentRepository.findByGender(gender).stream();
-        return (int) stream.mapToDouble(Student::getAge).average().orElse(0.0);
+    public Double getAverageAgeByGender(Gender gender) {
+        return studentRepository.findAgeAverageByGender(gender);
     }
 
     public boolean checkStudentIsExisted(String name, int age, Gender gender, String province) {
@@ -52,13 +50,11 @@ public class StudentServices {
         return studentRepository.countByGenderAndAddressIsNull(gender);
     }
 
-    public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender) {
-        return studentRepository.findByNameStartingWithIgnoreCaseAndGender(prefixName, gender).stream().map(Student::getAge).toList();
+    public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender, Pageable pageable) {
+        return studentRepository.findByNameStartingWithIgnoreCaseAndGender(prefixName, gender, pageable).stream().map(Student::getAge).toList();
     }
 
-    public List<Student> getStudentsByAddress(String province, String district, String village) {
-        return studentRepository.findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(province, district, village)
-                .stream()
-                .sorted(Comparator.comparing(Student::getName).reversed().thenComparing(Student::getAge).reversed()).toList();
+    public Page<Student> getStudentsByAddress(String province, String district, String village, Pageable pageable) {
+        return studentRepository.findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(province, district, village, pageable);
     }
 }

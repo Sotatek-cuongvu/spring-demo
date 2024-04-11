@@ -2,18 +2,21 @@ package com.example.demo.repository;
 
 import com.example.demo.model.Gender;
 import com.example.demo.model.Student;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-@EnableJpaRepositories
 public interface StudentRepository extends JpaRepository<Student, String> {
-    List<Student> findByGender(Gender gender);
 
-    List<Student> findByAddress_ProvinceIgnoreCase(String address_province);
+//    Page<Student> findAll(Pageable pageable);
+
+    @Query("SELECT avg(s.age) from Student s where s.gender= :gender")
+    Double findAgeAverageByGender(Gender gender);
+
+    Page<Student> findByAddress_ProvinceIgnoreCase(String address_province, Pageable pageable);
 
     Integer countByGenderAndAddress_ProvinceIgnoreCase(Gender gender, String address_province);
 
@@ -21,8 +24,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     Integer countByGenderAndAddressIsNull(Gender gender);
 
-    List<Student> findByNameStartingWithIgnoreCaseAndGender(String name, Gender gender);
+    Page<Student> findByNameStartingWithIgnoreCaseAndGender(String name, Gender gender, Pageable pageable);
 
-    List<Student> findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(String province, String district, String village);
+    Page<Student> findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(String province, String district, String village, Pageable pageable);
 
 }

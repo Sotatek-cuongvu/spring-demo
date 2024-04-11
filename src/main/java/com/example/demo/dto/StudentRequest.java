@@ -14,7 +14,6 @@ public class StudentRequest {
     private Gender gender;
 
     public Address getAddress() {
-        System.out.println(this.getProvince() == null && this.getDistrict() == null && this.getVillage() == null);
         return (this.getProvince() == null && this.getDistrict() == null && this.getVillage() == null) ? null : new Address(this.getProvince(), this.getDistrict(), this.getVillage());
     }
 }
