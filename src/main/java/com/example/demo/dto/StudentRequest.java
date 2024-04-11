@@ -1,7 +1,7 @@
-package com.example.demo.dtos;
+package com.example.demo.dto;
 
-import com.example.demo.models.Address;
-import com.example.demo.models.Gender;
+import com.example.demo.model.Address;
+import com.example.demo.model.Gender;
 import lombok.Getter;
 
 @Getter
@@ -14,7 +14,6 @@ public class StudentRequest {
     private Gender gender;
 
     public Address getAddress() {
-        System.out.println(this.getProvince() == null && this.getDistrict() == null && this.getVillage() == null);
         return (this.getProvince() == null && this.getDistrict() == null && this.getVillage() == null) ? null : new Address(this.getProvince(), this.getDistrict(), this.getVillage());
     }
 }
