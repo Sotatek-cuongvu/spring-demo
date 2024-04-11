@@ -35,11 +35,11 @@ public class StudentServiceImpl implements StudentService {
 
     public Page<Student> getStudentsByProvince(String province, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
-        return studentRepository.findByAddress_ProvinceIgnoreCase(province, pageable);
+        return studentRepository.getStudentByProvince(province, pageable);
     }
 
     public int countStudentByGenderAndProvince(String province, Gender gender) {
-        return studentRepository.countByGenderAndAddress_ProvinceIgnoreCase(gender, province);
+        return studentRepository.countByGenderAndProvince(gender, province);
     }
 
     public Double getAverageAgeByGender(Gender gender) {
@@ -47,16 +47,15 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public boolean checkStudentIsExisted(String name, int age, Gender gender, String province) {
-        return studentRepository.existsByNameIgnoreCaseAndAgeAndGenderAndAddress_ProvinceIgnoreCase(name, age, gender, province);
+        return studentRepository.checkExistsByNameAgeGenderAndProvince(name, age, gender, province);
     }
 
     public int countWithoutAddress(Gender gender) {
         return studentRepository.countByGenderAndAddressIsNull(gender);
     }
 
-    public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender, Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
-        return studentRepository.findByNameStartingWithIgnoreCaseAndGender(prefixName, gender, pageable).stream().map(Student::getAge).toList();
+    public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender) {
+        return studentRepository.getAgeByPrefixNameAndGender(prefixName, gender);
     }
 
     public Page<Student> getStudentsByAddress(String province, String district, String village, Integer page, Integer pageSize) {
@@ -65,6 +64,6 @@ public class StudentServiceImpl implements StudentService {
                 (pageSize == null) ? 10 : pageSize,
                 Sort.by("name").and(Sort.by("age").descending())
         );
-        return studentRepository.findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(province, district, village, pageable);
+        return studentRepository.findByFullAddress(province, district, village, pageable);
     }
 }

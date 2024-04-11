@@ -68,14 +68,8 @@ public class StudentController {
     }
 
     @GetMapping("/age/list/")
-    public List<Integer> getListAgeByPrefixNameAndGender(
-            @RequestParam String prefixName,
-            @RequestParam Gender gender,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer pageSize
-
-    ) {
-        return studentService.getAgeByPrefixNameAndGender(prefixName, gender, page, pageSize);
+    public List<Integer> getListAgeByPrefixNameAndGender(@RequestParam String prefixName, @RequestParam Gender gender) {
+        return studentService.getAgeByPrefixNameAndGender(prefixName, gender);
     }
 
     // Post Method

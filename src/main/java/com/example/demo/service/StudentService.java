@@ -21,7 +21,7 @@ public interface StudentService {
 
     int countWithoutAddress(Gender gender);
 
-    List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender, Integer page, Integer pageSize);
+    List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender);
 
     Page<Student> getStudentsByAddress(String province, String district, String village, Integer page, Integer pageSize);
 }
