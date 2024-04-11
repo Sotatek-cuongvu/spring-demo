@@ -6,9 +6,6 @@ import com.example.demo.model.Student;
 import com.example.demo.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +24,7 @@ public class StudentController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize
     ) {
-
-        Pageable pageData = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
-        return ResponseEntity.status(HttpStatus.OK).body(studentService.getStudents(pageData)
+        return ResponseEntity.status(HttpStatus.OK).body(studentService.getStudents(page, pageSize)
         );
     }
 
@@ -41,16 +36,10 @@ public class StudentController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer pageSize
     ) {
-        Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
         if (district != null && village != null) {
-            pageable = PageRequest.of(
-                    (page == null) ? 0 : page,
-                    (pageSize == null) ? 10 : pageSize,
-                    Sort.by("name").and(Sort.by("age").descending())
-            );
-            return studentService.getStudentsByAddress(province, district, village, pageable);
+            return studentService.getStudentsByAddress(province, district, village, page, pageSize);
         }
-        return studentService.getStudentsByProvince(province, pageable);
+        return studentService.getStudentsByProvince(province, page, pageSize);
     }
 
     @GetMapping("/province/count/")
@@ -58,7 +47,7 @@ public class StudentController {
         return studentService.countStudentByGenderAndProvince(province, gender);
     }
 
-    @GetMapping("/no_address/count/")
+    @GetMapping("/noAddress/count/")
     public Integer countStudentWithoutAddress(@RequestParam Gender gender) {
         return studentService.countWithoutAddress(gender);
     }
@@ -86,14 +75,22 @@ public class StudentController {
             @RequestParam(required = false) Integer pageSize
 
     ) {
-        Pageable pageable = PageRequest.of((page == null) ? 0 : page, (pageSize == null) ? 10 : pageSize);
-        return studentService.getAgeByPrefixNameAndGender(prefixName, gender, pageable);
+        return studentService.getAgeByPrefixNameAndGender(prefixName, gender, page, pageSize);
     }
 
     // Post Method
     @PostMapping("/")
     public ResponseEntity<String> createStudent(@RequestBody StudentRequest studentRequest) {
-        if (studentService.addStudent(studentRequest.getName(), studentRequest.getAge(), studentRequest.getAddress(), studentRequest.getGender()))
+        if (
+                studentService.addStudent(
+                        studentRequest.getName(),
+                        studentRequest.getAge(),
+                        studentRequest.getProvince(),
+                        studentRequest.getDistrict(),
+                        studentRequest.getVillage(),
+                        studentRequest.getGender()
+                )
+        )
             return ResponseEntity.status(HttpStatus.OK).body("Successful!");
         else
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unsuccessful!");
