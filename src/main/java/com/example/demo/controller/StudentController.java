@@ -43,8 +43,8 @@ public class StudentController {
     }
 
     @GetMapping("/province/count/")
-    public Integer countStudentByProvinceAndGender(@RequestParam Gender gender, @RequestParam String province) {
-        return studentService.countStudentByGenderAndProvince(province, gender);
+    public Integer countStudentByProvinceAndGender(@RequestParam Gender gender, @RequestParam String province, @RequestParam Integer age) {
+        return studentService.countStudentByGenderAndProvince(province, gender, age);
     }
 
     @GetMapping("/noAddress/count/")

@@ -21,8 +21,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("select s from Student s left join Address a on a.id=s.address.id where upper(a.province)=upper(:province)")
     Page<Student> getStudentByProvince(String province, Pageable pageable);
 
-    @Query("select count(s) from Student s left join Address a on a.id=s.address.id where s.gender=:gender and upper(a.province)=upper(:province)")
-    Integer countByGenderAndProvince(Gender gender, String province);
+    @Query("select count(s) from Student s left join Address a on a.id=s.address.id where s.gender=:gender and upper(a.province)=upper(:province) and s.age > :age")
+    Integer countByGenderAndProvince(Gender gender, String province, Integer age);
 
     @Query("select exists(( select s from Student s left join Address a on a.id=s.address.id where upper(s.name)=upper(:name) and s.age=:age and s.gender=:gender and a.province=:province))")
     boolean checkExistsByNameAgeGenderAndProvince(String name, int age, Gender gender, String province);

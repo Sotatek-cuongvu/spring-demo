@@ -39,8 +39,8 @@ public class StudentServiceImpl implements StudentService {
         return studentRepository.getStudentByProvince(province, pageable);
     }
 
-    public int countStudentByGenderAndProvince(String province, Gender gender) {
-        return studentRepository.countByGenderAndProvince(gender, province);
+    public int countStudentByGenderAndProvince(String province, Gender gender, Integer age) {
+        return studentRepository.countByGenderAndProvince(gender, province, age);
     }
 
     public Double getAverageAgeByGender(Gender gender) {

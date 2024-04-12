@@ -13,7 +13,7 @@ public interface StudentService {
 
     Page<Student> getStudentsByProvince(String province, Integer page, Integer pageSize);
 
-    int countStudentByGenderAndProvince(String province, Gender gender);
+    int countStudentByGenderAndProvince(String province, Gender gender, Integer age);
 
     Double getAverageAgeByGender(Gender gender);
 
