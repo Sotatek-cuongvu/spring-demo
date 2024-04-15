@@ -1,60 +1,27 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Address;
 import com.example.demo.model.Gender;
 import com.example.demo.model.Student;
-import com.example.demo.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
-import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.Objects;
 
-@Service
-public class StudentService {
+public interface StudentService {
+    boolean addStudent(String name, int age, String province, String district, String village, Gender gender);
 
-    @Autowired
-    StudentRepository studentRepository;
+    Page<Student> getStudents(Integer page, Integer pageSize);
 
-    public boolean addStudent(String name, int age, Address address, Gender gender) {
-        if (age >= 100 || age <= 0) throw new InvalidParameterException("Age is invalid");
-        if (Objects.equals(name, "") || name == null) throw new InvalidParameterException("Name is invalid");
-        studentRepository.save(new Student(name, age, address, gender));
-        return true;
-    }
+    Page<Student> getStudentsByProvince(String province, Integer page, Integer pageSize);
 
-    public Page<Student> getStudents(Pageable pageRequest) {
-        return studentRepository.findAll(pageRequest);
-    }
+    int countStudentByGenderAndProvince(String province, Gender gender, Integer age);
 
-    public Page<Student> getStudentsByProvince(String province, Pageable pageable) {
-        return studentRepository.findByAddress_ProvinceIgnoreCase(province, pageable);
-    }
+    Double getAverageAgeByGender(Gender gender);
 
-    public int countStudentByGenderAndProvince(String province, Gender gender) {
-        return studentRepository.countByGenderAndAddress_ProvinceIgnoreCase(gender, province);
-    }
+    boolean checkStudentIsExisted(String name, int age, Gender gender, String province);
 
-    public Double getAverageAgeByGender(Gender gender) {
-        return studentRepository.findAgeAverageByGender(gender);
-    }
+    int countWithoutAddress(Gender gender);
 
-    public boolean checkStudentIsExisted(String name, int age, Gender gender, String province) {
-        return studentRepository.existsByNameIgnoreCaseAndAgeAndGenderAndAddress_ProvinceIgnoreCase(name, age, gender, province);
-    }
+    List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender);
 
-    public int countWithoutAddress(Gender gender) {
-        return studentRepository.countByGenderAndAddressIsNull(gender);
-    }
-
-    public List<Integer> getAgeByPrefixNameAndGender(String prefixName, Gender gender, Pageable pageable) {
-        return studentRepository.findByNameStartingWithIgnoreCaseAndGender(prefixName, gender, pageable).stream().map(Student::getAge).toList();
-    }
-
-    public Page<Student> getStudentsByAddress(String province, String district, String village, Pageable pageable) {
-        return studentRepository.findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(province, district, village, pageable);
-    }
+    Page<Student> getStudentsByAddress(String province, String district, String village, Integer page, Integer pageSize);
 }

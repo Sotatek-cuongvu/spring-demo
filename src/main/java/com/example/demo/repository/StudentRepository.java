@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StudentRepository extends JpaRepository<Student, String> {
 
@@ -16,16 +18,21 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("SELECT avg(s.age) from Student s where s.gender= :gender")
     Double findAgeAverageByGender(Gender gender);
 
-    Page<Student> findByAddress_ProvinceIgnoreCase(String address_province, Pageable pageable);
+    @Query("select s from Student s left join Address a on a.id=s.address.id where upper(a.province)=upper(:province)")
+    Page<Student> getStudentByProvince(String province, Pageable pageable);
 
-    Integer countByGenderAndAddress_ProvinceIgnoreCase(Gender gender, String address_province);
+    @Query("select count(s) from Student s left join Address a on a.id=s.address.id where s.gender=:gender and upper(a.province)=upper(:province) and s.age > :age")
+    Integer countByGenderAndProvince(Gender gender, String province, Integer age);
 
-    boolean existsByNameIgnoreCaseAndAgeAndGenderAndAddress_ProvinceIgnoreCase(String name, int age, Gender gender, String province);
+    @Query("select exists(( select s from Student s left join Address a on a.id=s.address.id where upper(s.name)=upper(:name) and s.age=:age and s.gender=:gender and a.province=:province))")
+    boolean checkExistsByNameAgeGenderAndProvince(String name, int age, Gender gender, String province);
 
     Integer countByGenderAndAddressIsNull(Gender gender);
 
-    Page<Student> findByNameStartingWithIgnoreCaseAndGender(String name, Gender gender, Pageable pageable);
+    @Query("select s.age from Student s where upper(s.name) like upper(:name)||'%' and s.gender=(:gender)")
+    List<Integer> getAgeByPrefixNameAndGender(String name, Gender gender);
 
-    Page<Student> findByAddress_ProvinceIgnoreCaseAndAddress_DistrictIgnoreCaseAndAddress_villageIgnoreCase(String province, String district, String village, Pageable pageable);
+    @Query("select s1_0 from Student s1_0 left join Address a1_0 on a1_0.id=s1_0.address.id where upper(a1_0.province)=upper(:province) and upper(a1_0.district)=upper(:district) and upper(a1_0.village)=upper(:village)")
+    Page<Student> findByFullAddress(String province, String district, String village, Pageable pageable);
 
 }
